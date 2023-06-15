@@ -1,0 +1,55 @@
+#reading data
+pef_amilafinal
+
+#1. Mengidentifikasi outlier berdasarkan kriteria dan visualisasi grafik boxplot
+summary(pef_amilafinal$pef)
+boxplot(pef_amilafinal$pef)
+
+#2. Menentukan cut off outlier (batas atas dan bawah) dari grafik boxplot tersebut.
+min(boxplot(pef_amilafinal$pef, plot = FALSE)$out)
+max(boxplot(pef_amilafinal$pef, plot = FALSE)$out)
+
+quartiles <- quantile(pef_amilafinal$pef, probs=c(.25, .75), na.rm=FALSE)
+quartiles
+
+IQR <- IQR(pef_amilafinal$pef)
+IQR
+
+Lower <- quartiles[1] - 1.5*IQR
+Lower
+
+Upper <- quartiles[2] + 1.5*IQR
+Upper
+
+#3. Membuat dataset yang tidak berisi outlier sesuai cut off no 2. 
+
+pef_amilafinal_no <- subset(pef_amilafinal, pef_amilafinal$pef > Lower 
+                       & pef_amilafinal$pef < Upper)
+summary(pef_amilafinal_no)
+boxplot(pef_amilafinal_no$pef)
+
+#4. Melakukan tes normalitas pada dataset dengan outlier dan tanpa outlier.
+#For Big Sample (Kolmogrov-Smirnov)
+library(nortest)
+lillie.test(pef_amilafinal$pef)
+lillie.test(pef_amilafinal_no$pef)
+
+#5. Membuat grafik QQ line untuk membandingkan visualisasi nilai pef pada dataset dengan outlier dan tanpa outlier.
+qqnorm(pef_amilafinal$pef); qqline(pef_amilafinal$pef)
+qqnorm(pef_amilafinal_no$pef); qqline(pef_amilafinal_no$pef)
+
+#6. Membuat scatterplot yang memperlihatkan hubungan antara pef dengan height, dengan penambahan garis linear/regresi dan smoothed dengan loes (local regression smoothing).
+plot(pef_amilafinal_no$pef~pef_amilafinal_no$height)
+
+smoothScatter(pef_amilafinal_no$pef~pef_amilafinal_no$height)
+
+abline(lm(pef_amilafinal_no$pef~pef_amilafinal_no$height, data = pef_amilafinal_no), col = "blue")
+lines(lowess(pef_amilafinal_no$height, pef_amilafinal_no$pef), col = "red")
+#7. Membuat scatterplot yang memperlihatkan hubungan antara pef dengan umur, dengan penambahan garis linear/regresi dan smoothed dengan loes (local regression smoothing).
+
+plot(pef_amilafinal_no$pef~pef_amilafinal_no$age)
+
+smoothScatter(pef_amilafinal_no$pef~pef_amilafinal_no$height)
+
+abline(lm(pef_amilafinal_no$pef~pef_amilafinal_no$age, data = pef_amilafinal_no), col = "blue")
+lines(lowess(pef_amilafinal_no$age, pef_amilafinal_no$pef), col = "red")
